@@ -60,7 +60,13 @@ Use the code in `hardcover-proxy-worker.js`.
   - Worker URL is correct and deployed
   - Worker allows `POST` and `OPTIONS` requests
 
+## Still to be sorted
+- Published date is a number right now and not date, should be a quick fix that I'll try do this week.
+- Want to add syncing book progress
+- Need to sync book cover as a separate property as book covers are terrible dimensions to display in a banner
 
+## Contributions
+- I would love for anyone who wants to add features / clean up code etc. to do so. Please feel free to submit a PR and I'll get it approved ASAP. Any questions shoot me a message in the Discord server.
 
 # Example Images
 <img width="1066" height="1347" alt="image" src="https://github.com/user-attachments/assets/62475f4b-e1de-4cd5-9347-f340505b289b" />
