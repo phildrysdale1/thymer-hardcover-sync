@@ -1,0 +1,227 @@
+{
+	"ver": 1,
+	"name": "Books",
+	"icon": "book",
+	"color": null,
+	"home": false,
+	"page_field_ids": [
+		"title",
+		"author",
+		"published_year",
+		"status",
+		"rating",
+		"genres",
+		"read_date",
+		"synopsis"
+	],
+	"item_name": "Book",
+	"description": "Sync your Hardcover reading library. Each book becomes its own page with title, author, genres, status, rating and more.",
+	"show_sidebar_items": false,
+	"show_cmdpal_items": true,
+	"fields": [
+		{
+			"id": "title",
+			"label": "Title",
+			"type": "text",
+			"icon": "ti-book",
+			"many": false,
+			"read_only": false,
+			"active": true
+		},
+		{
+			"id": "author",
+			"label": "Author",
+			"type": "text",
+			"icon": "ti-user",
+			"many": false,
+			"read_only": false,
+			"active": true
+		},
+		{
+			"id": "published_year",
+			"label": "Published Year",
+			"type": "number",
+			"icon": "ti-calendar",
+			"many": false,
+			"read_only": false,
+			"active": true
+		},
+		{
+			"id": "status",
+			"label": "Status",
+			"type": "choice",
+			"icon": "ti-circle-check",
+			"many": false,
+			"read_only": false,
+			"active": true,
+			"choices": [
+				{
+					"id": "want_to_read",
+					"label": "Want to Read",
+					"icon": "",
+					"color": "4",
+					"active": true
+				},
+				{
+					"id": "currently_reading",
+					"label": "Currently Reading",
+					"icon": "",
+					"color": "14",
+					"active": true
+				},
+				{
+					"id": "read",
+					"label": "Read",
+					"icon": "",
+					"color": "2",
+					"active": true
+				},
+				{
+					"id": "paused",
+					"label": "Paused",
+					"icon": "",
+					"color": "1",
+					"active": true
+				},
+				{
+					"id": "did_not_finish",
+					"label": "Did Not Finish",
+					"icon": "",
+					"color": "0",
+					"active": true
+				}
+			]
+		},
+		{
+			"id": "rating",
+			"label": "Rating",
+			"type": "number",
+			"icon": "ti-star",
+			"many": false,
+			"read_only": false,
+			"active": true
+		},
+		{
+			"id": "genres",
+			"label": "Genres",
+			"type": "text",
+			"icon": "ti-tag",
+			"many": true,
+			"read_only": false,
+			"active": true
+		},
+		{
+			"id": "read_date",
+			"label": "Read Date",
+			"type": "text",
+			"icon": "ti-calendar-event",
+			"many": false,
+			"read_only": false,
+			"active": true
+		},
+		{
+			"id": "synopsis",
+			"label": "Synopsis",
+			"type": "text",
+			"icon": "ti-file-text",
+			"many": false,
+			"read_only": false,
+			"active": true
+		},
+		{
+			"id": "hardcover_id",
+			"label": "Hardcover ID",
+			"type": "number",
+			"icon": "ti-hash",
+			"many": false,
+			"read_only": true,
+			"active": true
+		},
+		{
+			"icon": "ti-clock-edit",
+			"id": "updated_at",
+			"label": "Modified",
+			"many": false,
+			"read_only": true,
+			"active": true,
+			"type": "datetime"
+		},
+		{
+			"icon": "ti-clock-plus",
+			"id": "created_at",
+			"label": "Created",
+			"many": false,
+			"read_only": true,
+			"active": true,
+			"type": "datetime"
+		},
+		{
+			"icon": "ti-photo",
+			"id": "banner",
+			"label": "Banner",
+			"many": false,
+			"read_only": false,
+			"active": true,
+			"type": "banner"
+		}
+	],
+	"sidebar_record_sort_dir": "desc",
+	"sidebar_record_sort_field_id": "updated_at",
+	"managed": {
+		"fields": false,
+		"views": false,
+		"sidebar": false
+	},
+	"custom": {},
+	"views": [
+		{
+			"id": "board",
+			"type": "gallery",
+			"label": "Bookcase",
+			"icon": "",
+			"description": "",
+			"query": "",
+			"shown": true,
+			"read_only": false,
+			"field_ids": [
+				"author",
+				"rating",
+				"genres",
+				"status"
+			],
+			"sort_field_id": "status",
+			"sort_dir": "desc",
+			"group_by_field_id": "status",
+			"opts": {
+				"gallery_style": "cover-books"
+			}
+		},
+		{
+			"id": "table",
+			"type": "table",
+			"label": "Table",
+			"icon": "",
+			"description": "",
+			"query": "",
+			"shown": true,
+			"read_only": false,
+			"field_ids": [
+				"title",
+				"author",
+				"status",
+				"read_date",
+				"rating",
+				"genres",
+				"published_year"
+			],
+			"sort_field_id": "updated_at",
+			"sort_dir": "desc",
+			"group_by_field_id": null
+		}
+	],
+	"default_banner": null,
+	"sidebar_display_mode": {
+		"mode": "hidden_records"
+	},
+	"related_query": ""
+}
