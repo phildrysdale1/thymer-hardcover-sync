@@ -14,7 +14,9 @@ Simple plugin to sync your Hardcover library into a Thymer Books collection.
   - Synopsis
   - Genres
   - Status
-  - Rating
+  - Progress (For "currently reading" & "did not finish" books)
+  - My Rating
+  - Hardcover Rating
   - Hardcover ID
 - Sets each book's banner image from Hardcover cover data (when available)
 
@@ -61,8 +63,6 @@ Use the code in `hardcover-proxy-worker.js`.
   - Worker allows `POST` and `OPTIONS` requests
 
 ## Still to be sorted
-- Published date is a number right now and not date, should be a quick fix that I'll try do this week.
-- Want to add syncing book progress
 - Need to sync book cover as a separate property as book covers are terrible dimensions to display in a banner
 
 ## Contributions
