@@ -1,22 +1,15 @@
 {
-	"ver": 1,
+	"ver": 1.1,
 	"name": "Books",
 	"icon": "book",
 	"color": null,
 	"home": false,
 	"page_field_ids": [
-		"title",
-		"author",
-		"published_year",
-		"status",
-		"rating",
-		"genres",
-		"read_date",
-		"synopsis"
+		"title"
 	],
 	"item_name": "Book",
-	"description": "Sync your Hardcover reading library. Each book becomes its own page with title, author, genres, status, rating and more.",
-	"show_sidebar_items": false,
+	"description": "Sync your Hardcover reading library. Each book becomes its own page with title, author, genres, status, ratings, progress, banner and more.",
+	"show_sidebar_items": true,
 	"show_cmdpal_items": true,
 	"fields": [
 		{
@@ -39,8 +32,8 @@
 		},
 		{
 			"id": "published_year",
-			"label": "Published Year",
-			"type": "number",
+			"label": "Published",
+			"type": "datetime",
 			"icon": "ti-calendar",
 			"many": false,
 			"read_only": false,
@@ -94,9 +87,90 @@
 		},
 		{
 			"id": "rating",
-			"label": "Rating",
-			"type": "number",
+			"label": "My Rating",
+			"type": "choice",
 			"icon": "ti-star",
+			"many": false,
+			"read_only": false,
+			"active": true,
+			"choices": [
+				{
+					"id": "stars_0_5",
+					"label": "⯪☆☆☆☆",
+					"icon": "",
+					"color": "0",
+					"active": true
+				},
+				{
+					"id": "stars_1_0",
+					"label": "★☆☆☆☆",
+					"icon": "",
+					"color": "0",
+					"active": true
+				},
+				{
+					"id": "stars_1_5",
+					"label": "★⯪☆☆☆",
+					"icon": "",
+					"color": "0",
+					"active": true
+				},
+				{
+					"id": "stars_2_0",
+					"label": "★★☆☆☆",
+					"icon": "",
+					"color": "0",
+					"active": true
+				},
+				{
+					"id": "stars_2_5",
+					"label": "★★⯪☆☆",
+					"icon": "",
+					"color": "0",
+					"active": true
+				},
+				{
+					"id": "stars_3_0",
+					"label": "★★★☆☆",
+					"icon": "",
+					"color": "0",
+					"active": true
+				},
+				{
+					"id": "stars_3_5",
+					"label": "★★★⯪☆",
+					"icon": "",
+					"color": "0",
+					"active": true
+				},
+				{
+					"id": "stars_4_0",
+					"label": "★★★★☆",
+					"icon": "",
+					"color": "0",
+					"active": true
+				},
+				{
+					"id": "stars_4_5",
+					"label": "★★★★⯪",
+					"icon": "",
+					"color": "0",
+					"active": true
+				},
+				{
+					"id": "stars_5_0",
+					"label": "★★★★★",
+					"icon": "",
+					"color": "0",
+					"active": true
+				}
+			]
+		},
+		{
+			"id": "progress",
+			"label": "Progress",
+			"type": "number",
+			"icon": "ti-chart-bar",
 			"many": false,
 			"read_only": false,
 			"active": true
@@ -138,6 +212,15 @@
 			"active": true
 		},
 		{
+			"icon": "ti-align-left",
+			"id": "icon",
+			"label": "Icon",
+			"many": false,
+			"read_only": false,
+			"active": true,
+			"type": "text"
+		},
+		{
 			"icon": "ti-clock-edit",
 			"id": "updated_at",
 			"label": "Modified",
@@ -175,28 +258,6 @@
 	"custom": {},
 	"views": [
 		{
-			"id": "board",
-			"type": "gallery",
-			"label": "Bookcase",
-			"icon": "",
-			"description": "",
-			"query": "",
-			"shown": true,
-			"read_only": false,
-			"field_ids": [
-				"author",
-				"rating",
-				"genres",
-				"status"
-			],
-			"sort_field_id": "status",
-			"sort_dir": "desc",
-			"group_by_field_id": "status",
-			"opts": {
-				"gallery_style": "cover-books"
-			}
-		},
-		{
 			"id": "table",
 			"type": "table",
 			"label": "Table",
@@ -206,22 +267,62 @@
 			"shown": true,
 			"read_only": false,
 			"field_ids": [
-				"title",
+				"title"
 				"author",
 				"status",
-				"read_date",
+				"progress",
 				"rating",
+				"hc_rating",
 				"genres",
+				"read_date",
 				"published_year"
 			],
 			"sort_field_id": "updated_at",
 			"sort_dir": "desc",
 			"group_by_field_id": null
+		},
+		{
+			"id": "board",
+			"type": "board",
+			"label": "Status Board",
+			"icon": "",
+			"description": "",
+			"query": "",
+			"shown": true,
+			"read_only": false,
+			"field_ids": [
+				"banner",
+				"author",
+				"progress",
+				"rating",
+				"hc_rating",
+				"genres"
+			],
+			"sort_field_id": "updated_at",
+			"sort_dir": "desc",
+			"group_by_field_id": "status"
+		},
+		{
+			"id": "VV73N1Q1VV708H7",
+			"shown": true,
+			"icon": "",
+			"label": "Bookshelf",
+			"description": "",
+			"field_ids": [
+				"author",
+				"published_year",
+				"status",
+				"rating"
+			],
+			"type": "gallery",
+			"read_only": false,
+			"group_by_field_id": null,
+			"sort_dir": "desc",
+			"sort_field_id": "updated_at",
+			"opts": {
+				"gallery_style": "cover-books"
+			}
 		}
 	],
-	"default_banner": null,
-	"sidebar_display_mode": {
-		"mode": "hidden_records"
-	},
-	"related_query": ""
+	"default_banner": null
 }
