@@ -2,8 +2,8 @@
  * Hardcover Books — Thymer Collection Plugin
  *
  * Creates one page (record) per book in your Hardcover library.
- * Each record gets: Title, Author, Published Year, Read Date,
- * Synopsis, Genres, Status, and Rating.
+ * Each record gets: Title, Author, Published, Read Date,
+ * Synopsis, Genres, Status, My Rating, Hardcover Rating, Progress, and Banner.
  *
  * Setup:
  * 1. Install as a Collection Plugin on a new "Books" collection
@@ -27,6 +27,8 @@ class Plugin extends CollectionPlugin {
             publishedYear: 'published_year',
             status: 'status',
             rating: 'rating',
+            hcRating: 'hc_rating',
+            progress: 'progress',
             genres: 'genres',
             readDate: 'read_date',
             synopsis: 'synopsis',
@@ -260,9 +262,23 @@ class Plugin extends CollectionPlugin {
     async _createRecord(book) {
         const guid = this.collection.createRecord(book.title);
         if (!guid) return;
-        const record = this.data.getRecord(guid);
+        const record = await this._waitForRecord(guid);
         if (!record) return;
         await this._applyToRecord(record, book);
+    }
+
+    async _waitForRecord(guid, attempts = 10, delayMs = 50) {
+        for (let i = 0; i < attempts; i++) {
+            const records = await this.collection.getAllRecords();
+            const record = records.find(r => r && r.guid === guid) || null;
+            if (record) return record;
+            await this._sleep(delayMs);
+        }
+        return null;
+    }
+
+    _sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
     async _applyToRecord(record, book) {
@@ -276,10 +292,12 @@ class Plugin extends CollectionPlugin {
 
         set(this.FIELDS.title, book.title);
         set(this.FIELDS.author, book.author);
-        set(this.FIELDS.publishedYear, book.publishedYear);
+        this._applyPublishedYear(record, book.publishedYear);
         set(this.FIELDS.readDate, book.readDate);
         set(this.FIELDS.synopsis, book.synopsis);
-        set(this.FIELDS.rating, book.rating);
+        this._applyRatingChoice(record, this.FIELDS.rating, book.rating);
+        this._applyRatingChoice(record, this.FIELDS.hcRating, book.hcRating);
+        this._setOrClear(record, this.FIELDS.progress, book.progress);
         set(this.FIELDS.hardcoverId, book.id);
 
         const statusProp = record.prop(this.FIELDS.status);
@@ -309,6 +327,7 @@ class Plugin extends CollectionPlugin {
                         rating
                         book {
                             title
+                            rating
                             release_year
                             release_date
                             description
@@ -327,6 +346,7 @@ class Plugin extends CollectionPlugin {
                             order_by: { started_at: desc }
                             limit: 1
                         ) {
+                            progress
                             started_at
                             finished_at
                         }
@@ -348,6 +368,7 @@ class Plugin extends CollectionPlugin {
                         rating
                         book {
                             title
+                            rating
                             release_year
                             release_date
                             description
@@ -364,6 +385,7 @@ class Plugin extends CollectionPlugin {
                             order_by: { started_at: desc }
                             limit: 1
                         ) {
+                            progress
                             started_at
                             finished_at
                         }
@@ -394,6 +416,8 @@ class Plugin extends CollectionPlugin {
         const reads = ub.user_book_reads || [];
         const read  = reads[0] || null;
         const rating = typeof ub.rating === 'number' ? ub.rating : parseFloat(ub.rating);
+        const hcRating = typeof book.rating === 'number' ? book.rating : parseFloat(book.rating);
+        const progress = this._extractProgress(ub.status_id, read);
         const authorNames = this._extractAuthorNames(book.contributions);
         const fallbackAuthorNames = this._extractAuthorNamesFromCachedContributors(book.cached_contributors);
         const mergedAuthorNames = authorNames.length ? authorNames : fallbackAuthorNames;
@@ -410,7 +434,91 @@ class Plugin extends CollectionPlugin {
             coverUrl:      this._extractCoverUrl(book),
             status:        this._mapStatus(ub.status_id),
             rating:        Number.isFinite(rating) ? rating : null,
+            hcRating:      Number.isFinite(hcRating) ? hcRating : null,
+            progress:      Number.isFinite(progress) ? progress : null,
         };
+    }
+
+    _extractProgress(statusId, read) {
+        if (statusId !== 2 && statusId !== 5) return null;
+        if (!read) return null;
+        const progress = typeof read.progress === 'number' ? read.progress : parseFloat(read.progress);
+        return Number.isFinite(progress) ? progress : null;
+    }
+
+    _setOrClear(record, fieldName, value) {
+        const prop = record.prop(fieldName);
+        if (!prop) return;
+        if (value == null || value === '' || (Array.isArray(value) && value.length === 0)) {
+            this._clearProperty(prop);
+            return;
+        }
+        prop.set(value);
+    }
+
+    _applyRatingChoice(record, fieldName, value) {
+        const prop = record.prop(fieldName);
+        if (!prop) return;
+        const choiceId = this._ratingToChoiceId(value);
+        if (!choiceId) {
+            this._clearProperty(prop);
+            return;
+        }
+        prop.setChoice(choiceId);
+    }
+
+    _ratingToChoiceId(value) {
+        const numeric = typeof value === 'number' ? value : parseFloat(value);
+        if (!Number.isFinite(numeric) || numeric <= 0) return null;
+        const rounded = Math.round(numeric * 2) / 2;
+        const clamped = Math.max(0.5, Math.min(5, rounded));
+        const whole = Math.floor(clamped);
+        const half = Math.abs(clamped - whole) === 0.5 ? '5' : '0';
+        return 'stars_' + whole + '_' + half;
+    }
+
+    _clearProperty(prop) {
+        const count = prop.count();
+        for (let i = count - 1; i >= 0; i--) {
+            prop.removeValueAt(i);
+        }
+    }
+
+    _applyPublishedYear(record, publishedYear) {
+        const prop = record.prop(this.FIELDS.publishedYear);
+        if (!prop) return;
+        if (!publishedYear) {
+            this._clearProperty(prop);
+            return;
+        }
+
+        const dt = this._dateOnlyFromHardcoverValue(publishedYear);
+        if (!dt) {
+            this._clearProperty(prop);
+            return;
+        }
+        prop.set(dt.value());
+    }
+
+    _dateOnlyFromHardcoverValue(value) {
+        if (typeof value === 'number' && Number.isFinite(value)) {
+            return DateTime.dateOnly(value, 0, 1);
+        }
+
+        const raw = String(value || '').trim();
+        if (!raw) return null;
+
+        const match = raw.match(/^(\d{4})(?:-(\d{1,2})(?:-(\d{1,2}))?)?/);
+        if (match) {
+            const year = parseInt(match[1], 10);
+            const month = match[2] ? parseInt(match[2], 10) - 1 : 0;
+            const day = match[3] ? parseInt(match[3], 10) : 1;
+            if (Number.isFinite(year) && month >= 0 && month <= 11 && day >= 1 && day <= 31) {
+                return DateTime.dateOnly(year, month, day);
+            }
+        }
+
+        return DateTime.parseDateTimeString(raw);
     }
 
     _extractAuthorNames(contributions) {
@@ -470,18 +578,23 @@ class Plugin extends CollectionPlugin {
         return null;
     }
 
+    _buildImageFileValue(title, coverUrl) {
+        const safeTitle = (title || 'book').replace(/[^a-z0-9_-]+/gi, '-').replace(/^-+|-+$/g, '').toLowerCase() || 'book';
+        return {
+            name: safeTitle + '-cover.jpg',
+            error: null,
+            guid: null,
+            imgData: null,
+            imgUrl: coverUrl,
+            imgClass: null,
+        };
+    }
+
     _applyBanner(record, coverUrl, title) {
         if (!coverUrl) return;
-        const safeTitle = (title || 'book').replace(/[^a-z0-9_-]+/gi, '-').replace(/^-+|-+$/g, '').toLowerCase() || 'book';
+
         try {
-            record.setBanner({
-                name: safeTitle + '-cover.jpg',
-                error: null,
-                guid: null,
-                imgData: null,
-                imgUrl: coverUrl,
-                imgClass: null,
-            });
+            record.setBanner(this._buildImageFileValue(title, coverUrl));
         } catch (e) {
             // Ignore banner errors so property sync still succeeds.
         }
