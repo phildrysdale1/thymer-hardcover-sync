@@ -1,5 +1,5 @@
 {
-	"ver": 1.1,
+	"ver": 1,
 	"name": "Books",
 	"icon": "book",
 	"color": null,
@@ -94,6 +94,87 @@
 			"read_only": false,
 			"active": true,
 			"choices": [
+			{
+					"id": "stars_0_5",
+					"label": "⯪☆☆☆☆",
+					"icon": "",
+					"color": "0",
+					"active": true
+				},
+				{
+					"id": "stars_1_0",
+					"label": "★☆☆☆☆",
+					"icon": "",
+					"color": "0",
+					"active": true
+				},
+				{
+					"id": "stars_1_5",
+					"label": "★⯪☆☆☆",
+					"icon": "",
+					"color": 6,
+					"active": true
+				},
+				{
+					"id": "stars_2_0",
+					"label": "★★☆☆☆",
+					"icon": "",
+					"color": 6,
+					"active": true
+				},
+				{
+					"id": "stars_2_5",
+					"label": "★★⯪☆☆",
+					"icon": "",
+					"color": 5,
+					"active": true
+				},
+				{
+					"id": "stars_3_0",
+					"label": "★★★☆☆",
+					"icon": "",
+					"color": 5,
+					"active": true
+				},
+				{
+					"id": "stars_3_5",
+					"label": "★★★⯪☆",
+					"icon": "",
+					"color": 3,
+					"active": true
+				},
+				{
+					"id": "stars_4_0",
+					"label": "★★★★☆",
+					"icon": "",
+					"color": 3,
+					"active": true
+				},
+				{
+					"id": "stars_4_5",
+					"label": "★★★★⯪",
+					"icon": "",
+					"color": 2,
+					"active": true
+				},
+				{
+					"id": "stars_5_0",
+					"label": "★★★★★",
+					"icon": "",
+					"color": 2,
+					"active": true
+				}
+			]
+		},
+		{
+			"id": "hc_rating",
+			"label": "Hardcover Rating",
+			"type": "choice",
+			"icon": "ti-stars",
+			"many": false,
+			"read_only": false,
+			"active": true,
+			"choices": [
 				{
 					"id": "stars_0_5",
 					"label": "⯪☆☆☆☆",
@@ -112,56 +193,56 @@
 					"id": "stars_1_5",
 					"label": "★⯪☆☆☆",
 					"icon": "",
-					"color": "0",
+					"color": 6,
 					"active": true
 				},
 				{
 					"id": "stars_2_0",
 					"label": "★★☆☆☆",
 					"icon": "",
-					"color": "0",
+					"color": 6,
 					"active": true
 				},
 				{
 					"id": "stars_2_5",
 					"label": "★★⯪☆☆",
 					"icon": "",
-					"color": "0",
+					"color": 5,
 					"active": true
 				},
 				{
 					"id": "stars_3_0",
 					"label": "★★★☆☆",
 					"icon": "",
-					"color": "0",
+					"color": 5,
 					"active": true
 				},
 				{
 					"id": "stars_3_5",
 					"label": "★★★⯪☆",
 					"icon": "",
-					"color": "0",
+					"color": 3,
 					"active": true
 				},
 				{
 					"id": "stars_4_0",
 					"label": "★★★★☆",
 					"icon": "",
-					"color": "0",
+					"color": 3,
 					"active": true
 				},
 				{
 					"id": "stars_4_5",
 					"label": "★★★★⯪",
 					"icon": "",
-					"color": "0",
+					"color": 2,
 					"active": true
 				},
 				{
 					"id": "stars_5_0",
 					"label": "★★★★★",
 					"icon": "",
-					"color": "0",
+					"color": 2,
 					"active": true
 				}
 			]
@@ -267,7 +348,6 @@
 			"shown": true,
 			"read_only": false,
 			"field_ids": [
-				"title"
 				"author",
 				"status",
 				"progress",
