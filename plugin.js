@@ -1,5 +1,6 @@
 /**
  * Hardcover Books — Thymer Collection Plugin
+ * Version: 1.2.0
  *
  * Creates one page (record) per book in your Hardcover library.
  * Each record gets: Title, Author, Published, Read Date,
@@ -233,12 +234,15 @@ class Plugin extends CollectionPlugin {
                 if (byHcId.has(book.id)) {
                     if (cache[book.id] === fp) { skipped++; continue; }
                     await this._applyToRecord(byHcId.get(book.id), book);
+                    await this._sleep(0);
                     updated++;
                 } else if (byTitle.has(this._titleKey(book.title))) {
                     await this._applyToRecord(byTitle.get(this._titleKey(book.title)), book);
+                    await this._sleep(0);
                     updated++;
                 } else {
                     await this._createRecord(book);
+                    await this._sleep(0);
                     created++;
                 }
             }
