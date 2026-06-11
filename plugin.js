@@ -20,6 +20,7 @@ class Plugin extends CollectionPlugin {
     onLoad() {
         this.API_KEY_STORAGE   = 'thymer_hardcover_apikey';
         this.PROXY_URL_STORAGE = 'thymer_hardcover_proxyurl';
+        this.SYNC_CACHE_STORAGE = 'thymer_hardcover_synccache';
         this.syncing = false;
         this.FIELDS = {
             title: 'title',
@@ -221,11 +222,16 @@ class Plugin extends CollectionPlugin {
                 if (titleKey && !byTitle.has(titleKey)) byTitle.set(titleKey, rec);
             }
 
-            let created = 0;
-            let updated = 0;
+            const cache = this._loadSyncCache();
+            const newCache = {};
+            let created = 0, updated = 0, skipped = 0;
 
             for (const book of books) {
+                const fp = this._bookFingerprint(book);
+                newCache[book.id] = fp;
+
                 if (byHcId.has(book.id)) {
+                    if (cache[book.id] === fp) { skipped++; continue; }
                     await this._applyToRecord(byHcId.get(book.id), book);
                     updated++;
                 } else if (byTitle.has(this._titleKey(book.title))) {
@@ -237,9 +243,11 @@ class Plugin extends CollectionPlugin {
                 }
             }
 
+            this._saveSyncCache(newCache);
+
             this.ui.addToaster({
                 title: 'Hardcover sync complete',
-                message: created + ' created, ' + updated + ' updated',
+                message: created + ' created, ' + updated + ' updated, ' + skipped + ' unchanged',
                 dismissible: true,
                 autoDestroyTime: 5000,
             });
@@ -657,6 +665,28 @@ class Plugin extends CollectionPlugin {
         const json = await res.json();
         if (json.errors && json.errors.length) throw new Error(json.errors[0].message);
         return json.data;
+    }
+
+    // -------------------------------------------------------------------------
+    // Sync cache (skip records whose data hasn't changed since last sync)
+    // -------------------------------------------------------------------------
+
+    _loadSyncCache() {
+        try { return JSON.parse(localStorage.getItem(this.SYNC_CACHE_STORAGE) || '{}'); }
+        catch { return {}; }
+    }
+
+    _saveSyncCache(cache) {
+        try { localStorage.setItem(this.SYNC_CACHE_STORAGE, JSON.stringify(cache)); }
+        catch {}
+    }
+
+    _bookFingerprint(book) {
+        return JSON.stringify([
+            book.title, book.author, book.publishedYear, book.readDate,
+            book.synopsis, book.genres, book.coverUrl, book.status,
+            book.rating, book.hcRating, book.progress,
+        ]);
     }
 
     // -------------------------------------------------------------------------
